@@ -33,8 +33,10 @@ class Game:
         for i, j in nei:
             dx = x - i
             dy = y - j
-            if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and self.map.fields[dx][dy] == Config.EMPTY_CELL.value:
+            if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
+            self.map.field[dx][dy] == Config.EMPTY_CELL.value:
                 res.append((dx, dy))
+
         return random.choice(res) if res else (x, y)
 
     def set_coord(self, obj, x, y):
@@ -44,35 +46,40 @@ class Game:
     def set_icon(self, x, y, icon):
         self.map.field[x][y] = icon
 
-    # def add_obj_to_map(self, x, y, icon):
-    #     self.map.fields[x][y] == icon
-
     def add_all_obj_to_map(self, objs):
         for obj in objs:
             self.set_icon(obj._x, obj._y, obj.icon)
 
     def monsters_step(self):
         available_monster = [x for x in self.monsters if x.is_alive]
-        # import pdb;pdb.set_trace()
+
         for x in available_monster:
+            old_cords = (x._x, x._y)
+            self.bussy_cells.pop(self.bussy_cells.index(old_cords))
+
             new_cords = self.get_available_cord(*x.pos)
             self.bussy_cells.append(new_cords)
-            
+
             self.set_coord(x, *new_cords)
-        self.bussy_cells.clear()
 
     def run(self):
-        print("GAME HAS BEGAN")
-        #self.map.show_map()
-        print(self.all_objects[0].icon)
         self.add_all_obj_to_map(self.all_objects)
+        self.map.show_map()
         while Game.game:
-            self.map.show_map()
-            # input()
-            import time;time.sleep(1)
-            self.map = Map()
+            # import time;time.sleep(1)
+            
             self.monsters_step()
             self.add_all_obj_to_map(self.all_objects)
+            self.map.draw_map(self.all_objects)
+            self.map.show_map()
+            # import pdb;pdb.set_trace()
+
+
+
+
+
+            # user_choice = input("Your step: w a s d: ")
+            # self.user_step
             os.system("cls")
 
         

@@ -20,6 +20,13 @@ class Map:
     def fields(self):
         return self.field
 
+    def draw_map(self, objs):
+        self.field = [['_' for _ in range(Config.MAP_HEIGHT.value)] for _ in range(Config.MAP_WIDTH.value)]
+        self.field = self.generate_map_board(self.field)
+
+        for obj in objs:
+            self.field[obj._x][obj._y] = obj.icon 
+
     
 
     

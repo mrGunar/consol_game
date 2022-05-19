@@ -16,10 +16,6 @@ class Monster:
         self._x += x
         self._y += y
 
-    def set_coord(self, x, y):
-        self._x = x
-        self._y = y
-
     @property
     def pos(self):
         return (self._x, self._y)
