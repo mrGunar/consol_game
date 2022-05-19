@@ -3,6 +3,7 @@ from map import Map
 from player import Player
 from monster import Monster
 from coordinator import Coord
+from bullet import Bullet
 import itertools
 from conf import Config
 import random
@@ -80,11 +81,35 @@ class Game:
                 self.player.step(0,1)
                 self.player.last_direction = "right"
             case "z":
-                pass
+                bullet = Bullet(self.player._x, self.player._y)
+                self.bullet_fly(bullet, self.player.last_direction)
             case _:
                 print("Please repeat")
                 return self.user_step(input("W A S D: "))
         self.set_icon(self.player._x, self.player._y, self.player.icon)
+
+
+    def bullet_fly(self, bullet, last_direction):
+        dx = 0
+        dy = 0
+        match last_direction:
+            case "up":
+                dx, dy = (1,0)
+            case "down":
+                dx, dy = (-1, 0)
+            case "right":
+                dx, dy = (0,-1)
+            case "left":
+                dx, dy = (0,1)
+
+        # import pdb;pdb.set_trace()
+        while 0 < bullet._x < Config.MAP_HEIGHT.value-2 and 0 < bullet._y < Config.MAP_WIDTH.value-2:
+            bullet._x -= dx
+            bullet._y -= dy
+            self.set_icon(bullet._x, bullet._y, bullet.icon)
+            self.map.show_map()
+            import time;time.sleep(0.1)
+            os.system("cls")
 
     def run(self):
         self.add_all_obj_to_map(self.all_objects)
