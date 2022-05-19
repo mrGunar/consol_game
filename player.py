@@ -8,6 +8,7 @@ class Player:
         self.is_alive = True
         self.bullet = 0
         self.icon = Config.HUMAN_ICON.value
+        self.last_direction = 'left'
     
     def step(self, x, y):
         self._x += x

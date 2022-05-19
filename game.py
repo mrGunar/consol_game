@@ -65,6 +65,27 @@ class Game:
             self.set_coord(x, *new_cords)
             self.set_icon(*new_cords, x.icon)
 
+    def user_step(self, user_choice):
+        match user_choice:
+            case "w":
+                self.player.step(-1,0)
+                self.player.last_direction = "up"
+            case "a":
+                self.player.step(0,-1)
+                self.player.last_direction = "left"
+            case "s":
+                self.player.step(1,0)
+                self.player.last_direction = "down"
+            case "d":
+                self.player.step(0,1)
+                self.player.last_direction = "right"
+            case "z":
+                pass
+            case _:
+                print("Please repeat")
+                return self.user_step(input("W A S D: "))
+        self.set_icon(self.player._x, self.player._y, self.player.icon)
+
     def run(self):
         self.add_all_obj_to_map(self.all_objects)
         self.map.show_map()
@@ -81,8 +102,8 @@ class Game:
 
 
 
-            # user_choice = input("Your step: w a s d: ")
-            # self.user_step
+            user_choice = input("Your step: w a s d: ")
+            self.user_step(user_choice)
             os.system("cls")
 
         
