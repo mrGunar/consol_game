@@ -1,3 +1,4 @@
+from ssl import OP_ENABLE_MIDDLEBOX_COMPAT
 from map import Map
 from player import Player
 from monster import Monster
@@ -53,27 +54,29 @@ class Game:
     def monsters_step(self):
         available_monster = [x for x in self.monsters if x.is_alive]
 
+        random.shuffle(available_monster)
         for x in available_monster:
             old_cords = (x._x, x._y)
             self.bussy_cells.pop(self.bussy_cells.index(old_cords))
 
             new_cords = self.get_available_cord(*x.pos)
             self.bussy_cells.append(new_cords)
-
+            
             self.set_coord(x, *new_cords)
+            self.set_icon(*new_cords, x.icon)
 
     def run(self):
         self.add_all_obj_to_map(self.all_objects)
         self.map.show_map()
         while Game.game:
-            # import time;time.sleep(1)
+            
             
             self.monsters_step()
             self.add_all_obj_to_map(self.all_objects)
             self.map.draw_map(self.all_objects)
             self.map.show_map()
             # import pdb;pdb.set_trace()
-
+            import time;time.sleep(1)
 
 
 

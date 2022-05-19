@@ -3,10 +3,10 @@ from enum import Enum
 
 class Config(Enum):
 
-    MAP_HEIGHT = 4
-    MAP_WIDTH = 4
+    MAP_HEIGHT = 20
+    MAP_WIDTH = 20
 
-    COUNT_MONSTER = 1
+    COUNT_MONSTER = 12
 
     BORDER_CELL = "\u25a1"
     EMPTY_CELL = "_"
