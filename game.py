@@ -1,6 +1,6 @@
 from ssl import OP_ENABLE_MIDDLEBOX_COMPAT
 from map import Map
-from player import Player
+from player import Player, Direction
 from monster import Monster
 from coordinator import Coord
 from bullet import Bullet
@@ -70,16 +70,16 @@ class Game:
         match user_choice:
             case "w":
                 self.player.step(-1,0)
-                self.player.last_direction = "up"
+                self.player.last_direction = Direction.UP
             case "a":
                 self.player.step(0,-1)
-                self.player.last_direction = "left"
+                self.player.last_direction = Direction.LEFT
             case "s":
                 self.player.step(1,0)
-                self.player.last_direction = "down"
+                self.player.last_direction = Direction.DOWN
             case "d":
                 self.player.step(0,1)
-                self.player.last_direction = "right"
+                self.player.last_direction = Direction.RIGHT
             case "z":
                 bullet = Bullet(self.player._x, self.player._y)
                 self.bullet_fly(bullet, self.player.last_direction)
@@ -93,13 +93,13 @@ class Game:
         dx = 0
         dy = 0
         match last_direction:
-            case "up":
+            case Direction.UP:
                 dx, dy = (1,0)
-            case "down":
+            case Direction.DOWN:
                 dx, dy = (-1, 0)
-            case "right":
+            case Direction.RIGHT:
                 dx, dy = (0,-1)
-            case "left":
+            case Direction.LEFT:
                 dx, dy = (0,1)
 
         while 0 < bullet._x < Config.MAP_HEIGHT.value-1 and 0 < bullet._y < Config.MAP_WIDTH.value-1:

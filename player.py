@@ -1,5 +1,12 @@
 from conf import Config
+from enum import Enum
 
+
+class Direction(Enum):
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
 
 class Player:
     def __init__(self, x=None, y=None) -> None:
@@ -8,7 +15,7 @@ class Player:
         self.is_alive = True
         self.bullet = 0
         self.icon = Config.HUMAN_ICON.value
-        self.last_direction = 'left'
+        self.last_direction = Direction.LEFT
     
     def step(self, x, y):
         self._x += x
