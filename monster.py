@@ -19,3 +19,8 @@ class Monster:
     @property
     def pos(self):
         return (self._x, self._y)
+
+    
+    def kill(self):
+        self.is_alive = False
+        self.icon = Config.EMPTY_CELL.value
