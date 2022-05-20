@@ -147,9 +147,15 @@ class Game:
 
     def run(self):
         self.add_all_obj_to_map(self.all_objects)
-        
+        monster_status, player_status = True, True
         while Game.game:
             self.map.show_map()
+            if not player_status:
+                Game.game = False
+                
+                print("GAME OVER! YOU LOSE")
+                input("Press any key...")
+                break 
             print(f'{sum([1 for x in self.monsters if x.is_alive])} monsters remain')
             user_choice = input("Your step: w a s d: ")
             self.user_step(user_choice)
@@ -167,11 +173,7 @@ class Game:
 
             self.map.draw_map(self.all_objects)
             # self.map.show_map()       
-            if not player_status:
-                Game.game = False
-                
-                print("GAME OVER! YOU LOSE")
-                input("Press any key...") 
+
             
             os.system("cls")
 

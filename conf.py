@@ -6,7 +6,7 @@ class Config(Enum):
     MAP_HEIGHT = 20
     MAP_WIDTH = 20
 
-    COUNT_MONSTER = 5
+    COUNT_MONSTER = 20
 
     BULLET_CELL = '*'
 
