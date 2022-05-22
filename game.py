@@ -23,13 +23,13 @@ class Game:
         self.all_objects = [self.player] + self.monsters
         self.set_coords_to_obj(self.all_objects)
 
-    def set_coords_to_obj(self, objs):
+    def set_coords_to_obj(self, objs) -> None:
         for obj in objs:
             coords = Coord.generate_free_coord(self.bussy_cells)
             self.bussy_cells.append(coords)
             obj._x, obj._y = coords
 
-    def get_available_cord(self, x, y):
+    def get_available_cord(self, x: int, y: int) -> tuple:
         nei = [(1,1), (1,0), (-1,0), (-1,1), (-1,0), (-1,-1), (0, 1), (0, -1)]
 
         res = []
@@ -41,10 +41,6 @@ class Game:
                 res.append((dx, dy))
 
         return random.choice(res) if res else (x, y)
-
-    def set_coord(self, obj, x, y):
-        obj._x = x
-        obj._y = y
 
     def set_icon(self, x, y, icon):
         self.map.field[x][y] = icon
@@ -60,10 +56,10 @@ class Game:
             old_cords = (x._x, x._y)
             self.bussy_cells.pop(self.bussy_cells.index(old_cords))
 
-            new_cords = self.get_available_cord(*x.pos)
+            new_cords = self.get_available_cord(*x.get_coords())
             self.bussy_cells.append(new_cords)
-            
-            self.set_coord(x, *new_cords)
+
+            x.set_coords(*new_cords)
             self.set_icon(*new_cords, x.icon)
 
     def user_step(self, user_choice):
@@ -143,7 +139,7 @@ class Game:
             dy = self.player._y - j
             if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
             self.map.field[dx][dy] == Config.MONSTER_ICON.value:
-                self.player.is_alive = False
+                self.player.kill_player()
 
     def run(self):
         self.add_all_obj_to_map(self.all_objects)
