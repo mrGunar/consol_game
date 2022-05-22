@@ -15,3 +15,12 @@ class Config(Enum):
     MONSTER_ICON = "M"
     HUMAN_ICON = "Y"
     ARMOUR_ICON = "W"
+
+
+class Phrase(Enum):
+
+    LOSE = "GAME OVER! YOU LOSE"
+    WIN = "GAME OVER! You win" 
+    EXIT = "Press any key..."
+
+    MONSTERS_REMAIN = "MONSTERS REMAINING"

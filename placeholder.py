@@ -19,4 +19,5 @@ class Object:
     @property
     def is_alive(self):
         return self._is_alive
+
     
