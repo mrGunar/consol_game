@@ -7,6 +7,7 @@ from bullet import Bullet
 import itertools
 from conf import Config
 import random
+import typing
 
 import os
 
@@ -42,14 +43,14 @@ class Game:
 
         return random.choice(res) if res else (x, y)
 
-    def set_icon(self, x, y, icon):
+    def set_icon(self, x: int, y: int, icon) -> None:
         self.map.fields[x][y] = icon
 
-    def add_all_obj_to_map(self, objs):
+    def add_all_obj_to_map(self, objs) -> None:
         for obj in objs:
             self.set_icon(obj._x, obj._y, obj.icon)
 
-    def monsters_step(self):
+    def monsters_step(self) -> None:
 
         random.shuffle(self.monsters)
         for x in self.monsters:
@@ -62,7 +63,7 @@ class Game:
             x.set_coords(*new_cords)
             self.set_icon(*new_cords, x.icon)
 
-    def user_step(self, user_choice):
+    def user_step(self, user_choice: str) -> None:
         match user_choice:
             case "w":
                 self.player.step(-1,0)
@@ -85,9 +86,10 @@ class Game:
         self.set_icon(self.player._x, self.player._y, self.player.icon)
 
 
-    def bullet_fly(self, bullet, last_direction):
+    def bullet_fly(self, bullet, last_direction: str) -> None:
         dx = 0
         dy = 0
+
         match last_direction:
             case Direction.UP:
                 dx, dy = (1,0)
@@ -109,7 +111,7 @@ class Game:
             import time;time.sleep(0.05)
             os.system("cls")
 
-    def check_status_for_bullet_fly(self, bullet):
+    def check_status_for_bullet_fly(self, bullet) -> bool:
         print(self.map.fields[bullet._x][bullet._y])
         if self.map.fields[bullet._x][bullet._y] == Config.MONSTER_ICON.value:
             monster = self.find_monster_with_coord(bullet._x, bullet._y)
@@ -120,18 +122,18 @@ class Game:
                 return True
         return False
 
-    def find_monster_with_coord(self, x, y):
+    def find_monster_with_coord(self, x: int, y: int) -> object:
         for m in self.monsters:
             if (x, y) == (m._x, m._y):
                 return m
 
-    def check_game_status(self):
+    def check_game_status(self) -> typing.Tuple[bool, bool]:
         available_monster = True if [x for x in self.monsters if x.is_alive] else False
         self.check_status_player_near_monsters()
 
         return available_monster, self.player.is_alive
 
-    def check_status_player_near_monsters(self):
+    def check_status_player_near_monsters(self) -> None:
         nei = [(1,1), (1,0), (-1,0), (-1,1), (-1,0), (-1,-1), (0, 1), (0, -1)]
 
         for i, j in nei:
@@ -141,7 +143,7 @@ class Game:
             self.map.fields[dx][dy] == Config.MONSTER_ICON.value:
                 self.player.kill_player()
 
-    def run(self):
+    def run(self) -> None:
         self.add_all_obj_to_map(self.all_objects)
         monster_status, player_status = True, True
         while Game.game:
