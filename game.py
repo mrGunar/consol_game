@@ -37,13 +37,13 @@ class Game:
             dx = x - i
             dy = y - j
             if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
-            self.map.field[dx][dy] == Config.EMPTY_CELL.value:
+            self.map.fields[dx][dy] == Config.EMPTY_CELL.value:
                 res.append((dx, dy))
 
         return random.choice(res) if res else (x, y)
 
     def set_icon(self, x, y, icon):
-        self.map.field[x][y] = icon
+        self.map.fields[x][y] = icon
 
     def add_all_obj_to_map(self, objs):
         for obj in objs:
@@ -110,8 +110,8 @@ class Game:
             os.system("cls")
 
     def check_status_for_bullet_fly(self, bullet):
-        print(self.map.field[bullet._x][bullet._y])
-        if self.map.field[bullet._x][bullet._y] == Config.MONSTER_ICON.value:
+        print(self.map.fields[bullet._x][bullet._y])
+        if self.map.fields[bullet._x][bullet._y] == Config.MONSTER_ICON.value:
             monster = self.find_monster_with_coord(bullet._x, bullet._y)
             if monster:
                 print("HEADSHOT")
@@ -138,7 +138,7 @@ class Game:
             dx = self.player._x - i
             dy = self.player._y - j
             if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
-            self.map.field[dx][dy] == Config.MONSTER_ICON.value:
+            self.map.fields[dx][dy] == Config.MONSTER_ICON.value:
                 self.player.kill_player()
 
     def run(self):

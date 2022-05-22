@@ -1,10 +1,10 @@
-import imp
 from conf import Config
+
 
 class Map:
     def __init__(self) -> None:
-        self.field = [['_' for _ in range(Config.MAP_HEIGHT.value)] for _ in range(Config.MAP_WIDTH.value)]
-        self.field = self.generate_map_board(self.field)
+        self._field = [['_' for _ in range(Config.MAP_HEIGHT.value)] for _ in range(Config.MAP_WIDTH.value)]
+        self._field = self.generate_map_board(self._field)
     
     def generate_map_board(self, f):
         f[0] = f[-1] = [Config.BORDER_CELL.value] *Config.MAP_HEIGHT.value
@@ -13,19 +13,19 @@ class Map:
         return f
 
     def show_map(self):
-        for row in self.field:
+        for row in self._field:
             print(*row)
     
     @property
     def fields(self):
-        return self.field
+        return self._field
 
     def draw_map(self, objs):
-        self.field = [['_' for _ in range(Config.MAP_HEIGHT.value)] for _ in range(Config.MAP_WIDTH.value)]
-        self.field = self.generate_map_board(self.field)
+        self._field = [['_' for _ in range(Config.MAP_HEIGHT.value)] for _ in range(Config.MAP_WIDTH.value)]
+        self._field = self.generate_map_board(self._field)
 
         for obj in objs:
-            self.field[obj._x][obj._y] = obj.icon 
+            self._field[obj._x][obj._y] = obj.icon 
 
     
 
