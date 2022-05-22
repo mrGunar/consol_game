@@ -10,7 +10,7 @@ class Monster(Object):
     @classmethod
     def create_monster(cls):
         return Monster()
-    
+
     def kill(self):
         self._is_alive = False
         self.icon = Config.EMPTY_CELL.value

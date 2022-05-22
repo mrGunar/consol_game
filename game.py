@@ -19,17 +19,17 @@ class Game:
         self.map = Map()
         self.player = Player()
         self.monsters = [Monster.create_monster() for _ in range(count_monsters)]
-        self.monsters = [x for x in self.monsters if x._is_alive]
+        self.monsters = [x for x in self.monsters if x.is_alive]
         self.all_objects = [self.player] + self.monsters
         self.set_coords_to_obj(self.all_objects)
 
-    def set_coords_to_obj(self, objs):
+    def set_coords_to_obj(self, objs) -> None:
         for obj in objs:
             coords = Coord.generate_free_coord(self.bussy_cells)
             self.bussy_cells.append(coords)
             obj._x, obj._y = coords
 
-    def get_available_cord(self, x, y):
+    def get_available_cord(self, x: int, y: int) -> tuple:
         nei = [(1,1), (1,0), (-1,0), (-1,1), (-1,0), (-1,-1), (0, 1), (0, -1)]
 
         res = []
@@ -41,10 +41,6 @@ class Game:
                 res.append((dx, dy))
 
         return random.choice(res) if res else (x, y)
-
-    def set_coord(self, obj, x, y):
-        obj._x = x
-        obj._y = y
 
     def set_icon(self, x, y, icon):
         self.map.field[x][y] = icon
@@ -62,8 +58,8 @@ class Game:
 
             new_cords = self.get_available_cord(*x.get_coords())
             self.bussy_cells.append(new_cords)
-            
-            self.set_coord(x, *new_cords)
+
+            x.set_coords(*new_cords)
             self.set_icon(*new_cords, x.icon)
 
     def user_step(self, user_choice):
@@ -130,10 +126,10 @@ class Game:
                 return m
 
     def check_game_status(self):
-        available_monster = True if [x for x in self.monsters if x._is_alive] else False
+        available_monster = True if [x for x in self.monsters if x.is_alive] else False
         self.check_status_player_near_monsters()
 
-        return available_monster, self.player._is_alive
+        return available_monster, self.player.is_alive
 
     def check_status_player_near_monsters(self):
         nei = [(1,1), (1,0), (-1,0), (-1,1), (-1,0), (-1,-1), (0, 1), (0, -1)]
@@ -143,7 +139,7 @@ class Game:
             dy = self.player._y - j
             if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
             self.map.field[dx][dy] == Config.MONSTER_ICON.value:
-                self.player.is_alive = False
+                self.player.kill_player()
 
     def run(self):
         self.add_all_obj_to_map(self.all_objects)
@@ -156,7 +152,7 @@ class Game:
                 print("GAME OVER! YOU LOSE")
                 input("Press any key...")
                 break 
-            print(f'{sum([1 for x in self.monsters if x._is_alive])} monsters remain')
+            print(f'{sum([1 for x in self.monsters if x.is_alive])} monsters remain')
             user_choice = input("Your step: w a s d: ")
             self.user_step(user_choice)
             monster_status, player_status = self.check_game_status()

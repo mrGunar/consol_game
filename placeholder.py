@@ -16,5 +16,7 @@ class Object:
         self._x += x
         self._y += y
 
-    
+    @property
+    def is_alive(self):
+        return self._is_alive
     

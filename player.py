@@ -23,12 +23,6 @@ class Player(Object):
     def get_bullet(self, count):
         self.bullet += count
 
-    # def set_coord(self, x, y):
-    #     self._x = x
-    #     self._y = y
-
-    # @property
-    # def pos(self):
-    #     return (self._x, self._y)
         
-    
+    def kill_player(self) -> None:
+        self._is_alive = False
