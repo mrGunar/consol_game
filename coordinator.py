@@ -1,6 +1,7 @@
 import random
 from conf import Config
 
+
 class Coord:
     @staticmethod
     def check_coord(coord, check_list: list) -> bool:
