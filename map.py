@@ -25,7 +25,8 @@ class Map:
         self._field = self.generate_map_board(self._field)
 
         for obj in objs:
-            self._field[obj._x][obj._y] = obj.icon 
+            if obj.is_alive:
+                self._field[obj._x][obj._y] = obj.icon 
 
     
 

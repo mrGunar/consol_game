@@ -1,11 +1,11 @@
-from ssl import OP_ENABLE_MIDDLEBOX_COMPAT
+from cmath import phase
 from map import Map
 from player import Player, Direction
 from monster import Monster
 from coordinator import Coord
 from bullet import Bullet
 import itertools
-from conf import Config
+from conf import Config, Phrase
 import random
 import typing
 
@@ -150,22 +150,23 @@ class Game:
             self.map.show_map()
             if not player_status:
                 Game.game = False
-                
-                print("GAME OVER! YOU LOSE")
-                input("Press any key...")
+
+                input(f"{Phrase.LOSE.value}\n{Phrase.EXIT.value}")
                 break 
-            print(f'{sum([1 for x in self.monsters if x.is_alive])} monsters remain')
+            monsters_last = sum([1 for x in self.monsters if x.is_alive])
+            print(f'{Phrase.MONSTERS_REMAIN.value}: {monsters_last}')
+
             user_choice = input("Your step: w a s d: ")
             self.user_step(user_choice)
             monster_status, player_status = self.check_game_status()
             if not monster_status:
                 Game.game = False
-                print("GAME OVER")
+
                 if player_status or not monster_status:
-                    print("YOU WIN!")
+                    input(f"{Phrase.WIN.value}\n{Phrase.EXIT.value}")
                 else:
-                    print("YOU LOSE")
-                input("Press any key...")
+                    input(f"{Phrase.LOSE.value}\n{Phrase.EXIT.value}")
+                
             self.monsters_step()
             self.add_all_obj_to_map(self.all_objects)
 
