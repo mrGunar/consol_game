@@ -1,14 +1,9 @@
-from cmath import phase
 from map import Map
-from player import Player, Direction
-from grenade import Grenade
-from monster import Monster
 from coordinator import Coord
-from bullet import Bullet
-import itertools
 from conf import Config, Phrase
 import random
 import typing
+from game_object import Player, Monster, Direction, Bullet, Grenade, BFG
 
 import os
 
@@ -84,6 +79,9 @@ class Game:
             case "x":
                 grenade = Grenade(self.player._x, self.player._y)
                 self.throw_grenade(grenade, self.player.last_direction)
+            case "c":
+                bfg = BFG(self.player._x, self.player._y)
+                self.bfg_shoot(bfg, self.player.last_direction)
             case _:
                 print("Please repeat")
                 return self.user_step(input("W A S D: "))
@@ -148,8 +146,6 @@ class Game:
                 self.player.kill_player()
 
     def throw_grenade(self,grenade, last_direction, d=3):
-        dx = 0
-        dy = 0
 
         match last_direction:
             case Direction.UP:
@@ -161,34 +157,65 @@ class Game:
             case Direction.LEFT:
                 dx, dy = (0,d)
 
-        grenade._x -= dx
-        grenade._y -= dy
+        grenade.change_coords(grenade.x - dx, grenade.y -dy)
 
-        self.explose_grenade(grenade._x, grenade._y)
+        self.explose_grenade(grenade)
 
-    def explose_grenade(self, x, y):
+    def explose_grenade(self, gren):
         nei = [(1,1), (1,0), (1,-1), (0,1), (0,0), (0,-1), (-1, 1), (-1,0), (-1,-1)]
 
-        res = []
+        c = 0
         for i, j in nei:
-            dx = x - i
-            dy = y - j
+            dx = gren.x - i
+            dy = gren.y - j
             if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
                 self.map.fields[dx][dy] != Config.BORDER_CELL.value:
-                self.set_icon(dx, dy, Config.GRENADE_ICON.value)
+                self.set_icon(dx, dy, gren.icon)
                 monster = self.find_monster_with_coord(dx, dy)
                 if monster:
-                    res.append(monster)
+                    monster.kill()
+                    c += 1
                 os.system("cls")
                 self.map.show_map()
                 import time;time.sleep(0.2)
-        for m in res:
-            m.kill()
-        print(f"YOU KILL {len(res)} MONSTERS")
+
+        print(f"YOU KILL {c} MONSTERS")
         import time;time.sleep(1)
+
+
+    def bfg_shoot(self, bfg, last_direction):
+        match last_direction:
+            case Direction.UP:
+                dd = (1,0), (1,-1), (1,1)
+            case Direction.DOWN:
+                dd = (-1,0), (-1,-1), (-1,1)
+            case Direction.RIGHT:
+                dd = (0,-1), (1,-1), (-1,-1)
+            case Direction.LEFT:
+                dd = (0,1), (1,1), (-1,1)
+
+
+        
+        while 0 < bfg._x < Config.MAP_HEIGHT.value-1 and 0 < bfg._y < Config.MAP_WIDTH.value-1:
+            for i, j in dd:
+                dx = bfg.x - i
+                dy = bfg.y - j
+                if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
+                    self.map.fields[dx][dy] != Config.BORDER_CELL.value:
+                    self.set_icon(dx, dy, bfg.icon)
+                    monster = self.find_monster_with_coord(dx, dy)
+                    if monster:
+                        monster.kill()
+                        
+                    os.system("cls")
+                    self.map.show_map()
+                    import time;time.sleep(0.05)
+            bfg.change_coords(bfg.x - dd[0][0], bfg.y - dd[0][1])
+            print("HUIHDJGSH")
+
+        import time;time.sleep(1)
+
                 
-
-
     def run(self) -> None:
         self.add_all_obj_to_map(self.all_objects)
         monster_status, player_status = True, True
@@ -217,9 +244,7 @@ class Game:
             self.add_all_obj_to_map(self.all_objects)
 
             self.map.draw_map(self.all_objects)
-            # self.map.show_map()       
 
-            
             os.system("cls")
 
         
