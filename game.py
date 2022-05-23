@@ -1,14 +1,9 @@
-from cmath import phase
 from map import Map
-from player import Player, Direction
-from grenade import Grenade
-from monster import Monster
 from coordinator import Coord
-from bullet import Bullet
-import itertools
 from conf import Config, Phrase
 import random
 import typing
+from game_object import Player, Monster, Direction, Bullet, Grenade
 
 import os
 
