@@ -1,6 +1,7 @@
 from cmath import phase
 from map import Map
 from player import Player, Direction
+from grenade import Grenade
 from monster import Monster
 from coordinator import Coord
 from bullet import Bullet
@@ -80,6 +81,9 @@ class Game:
             case "z":
                 bullet = Bullet(self.player._x, self.player._y)
                 self.bullet_fly(bullet, self.player.last_direction)
+            case "x":
+                grenade = Grenade(self.player._x, self.player._y)
+                self.throw_grenade(grenade, self.player.last_direction)
             case _:
                 print("Please repeat")
                 return self.user_step(input("W A S D: "))
@@ -142,6 +146,48 @@ class Game:
             if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
             self.map.fields[dx][dy] == Config.MONSTER_ICON.value:
                 self.player.kill_player()
+
+    def throw_grenade(self,grenade, last_direction, d=3):
+        dx = 0
+        dy = 0
+
+        match last_direction:
+            case Direction.UP:
+                dx, dy = (d,0)
+            case Direction.DOWN:
+                dx, dy = (-d, 0)
+            case Direction.RIGHT:
+                dx, dy = (0,-d)
+            case Direction.LEFT:
+                dx, dy = (0,d)
+
+        grenade._x -= dx
+        grenade._y -= dy
+
+        self.explose_grenade(grenade._x, grenade._y)
+
+    def explose_grenade(self, x, y):
+        nei = [(1,1), (1,0), (1,-1), (0,1), (0,0), (0,-1), (-1, 1), (-1,0), (-1,-1)]
+
+        res = []
+        for i, j in nei:
+            dx = x - i
+            dy = y - j
+            if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
+                self.map.fields[dx][dy] != Config.BORDER_CELL.value:
+                self.set_icon(dx, dy, Config.GRENADE_ICON.value)
+                monster = self.find_monster_with_coord(dx, dy)
+                if monster:
+                    res.append(monster)
+                os.system("cls")
+                self.map.show_map()
+                import time;time.sleep(0.2)
+        for m in res:
+            m.kill()
+        print(f"YOU KILL {len(res)} MONSTERS")
+        import time;time.sleep(1)
+                
+
 
     def run(self) -> None:
         self.add_all_obj_to_map(self.all_objects)

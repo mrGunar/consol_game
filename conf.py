@@ -6,15 +6,17 @@ class Config(Enum):
     MAP_HEIGHT = 20
     MAP_WIDTH = 20
 
-    COUNT_MONSTER = 20
+    COUNT_MONSTER = 2
 
     BULLET_CELL = '*'
+    GRENADE_ICON = "+"
 
     BORDER_CELL = "\u25a1"
     EMPTY_CELL = "_"
     MONSTER_ICON = "M"
     HUMAN_ICON = "Y"
     ARMOUR_ICON = "W"
+    
 
 
 class Phrase(Enum):
