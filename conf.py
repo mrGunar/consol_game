@@ -6,10 +6,11 @@ class Config(Enum):
     MAP_HEIGHT = 20
     MAP_WIDTH = 20
 
-    COUNT_MONSTER = 2
+    COUNT_MONSTER = 50
 
     BULLET_CELL = '*'
     GRENADE_ICON = "+"
+    BFG_CELL = "#"
 
     BORDER_CELL = "\u25a1"
     EMPTY_CELL = "_"

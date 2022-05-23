@@ -3,7 +3,7 @@ from coordinator import Coord
 from conf import Config, Phrase
 import random
 import typing
-from game_object import Player, Monster, Direction, Bullet, Grenade
+from game_object import Player, Monster, Direction, Bullet, Grenade, BFG
 
 import os
 
@@ -79,6 +79,9 @@ class Game:
             case "x":
                 grenade = Grenade(self.player._x, self.player._y)
                 self.throw_grenade(grenade, self.player.last_direction)
+            case "c":
+                bfg = BFG(self.player._x, self.player._y)
+                self.bfg_shoot(bfg, self.player.last_direction)
             case _:
                 print("Please repeat")
                 return self.user_step(input("W A S D: "))
@@ -178,6 +181,40 @@ class Game:
 
         print(f"YOU KILL {c} MONSTERS")
         import time;time.sleep(1)
+
+
+    def bfg_shoot(self, bfg, last_direction):
+        match last_direction:
+            case Direction.UP:
+                dd = (1,0), (1,-1), (1,1)
+            case Direction.DOWN:
+                dd = (-1,0), (-1,-1), (-1,1)
+            case Direction.RIGHT:
+                dd = (0,-1), (1,-1), (-1,-1)
+            case Direction.LEFT:
+                dd = (0,1), (1,1), (-1,1)
+
+
+        
+        while 0 < bfg._x < Config.MAP_HEIGHT.value-1 and 0 < bfg._y < Config.MAP_WIDTH.value-1:
+            for i, j in dd:
+                dx = bfg.x - i
+                dy = bfg.y - j
+                if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
+                    self.map.fields[dx][dy] != Config.BORDER_CELL.value:
+                    self.set_icon(dx, dy, bfg.icon)
+                    monster = self.find_monster_with_coord(dx, dy)
+                    if monster:
+                        monster.kill()
+                        
+                    os.system("cls")
+                    self.map.show_map()
+                    import time;time.sleep(0.05)
+            bfg.change_coords(bfg.x - dd[0][0], bfg.y - dd[0][1])
+            print("HUIHDJGSH")
+
+        import time;time.sleep(1)
+
                 
     def run(self) -> None:
         self.add_all_obj_to_map(self.all_objects)

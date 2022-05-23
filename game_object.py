@@ -59,4 +59,7 @@ class Grenade(WeaponObject):
         pass
 
 
-
+class BFG(WeaponObject):
+    def __init__(self, x=None, y=None) -> None:
+        super().__init__(x, y)
+        self.icon = Config.BFG_CELL.value
