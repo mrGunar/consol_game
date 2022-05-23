@@ -1,28 +1,6 @@
 from conf import Config
 from enum import Enum
-
-
-class Object:
-    def __init__(self, x=None, y=None, is_alive=None, is_object=None) -> None:
-        self._x = x
-        self._y = y
-        self._is_alive = is_alive
-        self._is_object = is_object
-
-    def get_coords(self) -> tuple:
-        return (self._x, self._y)
-
-    def set_coords(self, x: int, y: int) -> None:
-        self._x = x
-        self._y = y
-
-    def step(self, x: int, y: int) -> None:
-        self._x += x
-        self._y += y
-
-    @property
-    def is_alive(self):
-        return self._is_alive
+from objects import AliveObject, WeaponObject
 
 
 class Direction(Enum):
@@ -31,7 +9,8 @@ class Direction(Enum):
     LEFT = 'left',
     RIGHT = 'right'
 
-class Player(Object):
+
+class Player(AliveObject):
     def __init__(self, x=None, y=None) -> None:
         super().__init__(is_alive=True, is_object=False)
         self.bullet = 0
@@ -50,7 +29,7 @@ class Player(Object):
         self._is_alive = False
 
 
-class Monster(Object):
+class Monster(AliveObject):
     def __init__(self, x=None, y=None) -> None:
         super().__init__(is_alive=True, is_object=False)
         self.icon = Config.MONSTER_ICON.value
@@ -64,18 +43,20 @@ class Monster(Object):
         self.icon = Config.EMPTY_CELL.value
 
 
-class Bullet:
-    def __init__(self, x, y):
-        self._x = x
-        self._y = y
+
+class Bullet(WeaponObject):
+    def __init__(self, x=None, y=None):
+        super().__init__(x, y)
         self.icon = Config.BULLET_CELL.value
 
 
-class Grenade:
+class Grenade(WeaponObject):
     def __init__(self, x=None, y=None) -> None:
-        self._x = x
-        self._y = y
+        super().__init__(x, y)
+        self.icon = Config.GRENADE_ICON.value
 
     def explose(self, x, y, objs):
         pass
+
+
 
