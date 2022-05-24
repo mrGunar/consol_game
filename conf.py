@@ -6,7 +6,7 @@ class Config(Enum):
     MAP_HEIGHT = 20
     MAP_WIDTH = 20
 
-    COUNT_MONSTER = 50
+    COUNT_MONSTER = 3
 
     BULLET_CELL = '*'
     GRENADE_ICON = "+"

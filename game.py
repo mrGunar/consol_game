@@ -4,6 +4,7 @@ from conf import Config, Phrase
 import random
 import typing
 from game_object import Player, Monster, Direction, Bullet, Grenade, BFG
+import services
 
 import os
 
@@ -29,15 +30,19 @@ class Game:
     def get_available_cord(self, x: int, y: int) -> tuple:
         nei = [(1,1), (1,0), (-1,0), (-1,1), (-1,0), (-1,-1), (0, 1), (0, -1)]
 
-        res = []
+        res = {}
         for i, j in nei:
             dx = x - i
             dy = y - j
             if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
             self.map.fields[dx][dy] == Config.EMPTY_CELL.value:
-                res.append((dx, dy))
-
-        return random.choice(res) if res else (x, y)
+                # res.append((dx, dy))
+                res.update({(dx, dy): services.get_distance_betwen_two_point(self.player.get_coords(), (dx,dy))})
+        # import pdb;pdb.set_trace()
+        coords = services.get_coords_from_dict(res)
+        # return random.choice(res) if res else (x, y)
+        # import pdb;pdb.set_trace()
+        return coords if coords is not None else (x, y)
 
     def set_icon(self, x: int, y: int, icon) -> None:
         self.map.fields[x][y] = icon
@@ -49,6 +54,7 @@ class Game:
     def monsters_step(self) -> None:
 
         random.shuffle(self.monsters)
+
         for x in self.monsters:
             old_cords = (x._x, x._y)
             self.bussy_cells.pop(self.bussy_cells.index(old_cords))
