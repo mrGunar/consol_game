@@ -1,3 +1,6 @@
+from conf import Config
+
+
 class AliveObject:
     def __init__(self, x=None, y=None, is_alive=None, is_object=None) -> None:
         self._x = x
@@ -13,8 +16,10 @@ class AliveObject:
         self._y = y
 
     def step(self, x: int, y: int) -> None:
-        self._x += x
-        self._y += y
+        # import pdb;pdb.set_trace()
+        if 0 < self._x+x < Config.MAP_HEIGHT.value-1 and 0 < self._y+y < Config.MAP_WIDTH.value-1:
+            self._x += x
+            self._y += y
 
     @property
     def is_alive(self):

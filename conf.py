@@ -3,8 +3,8 @@ from enum import Enum
 
 class Config(Enum):
 
-    MAP_HEIGHT = 20
-    MAP_WIDTH = 20
+    MAP_HEIGHT = 35
+    MAP_WIDTH = 35
 
     COUNT_MONSTER = 3
 
