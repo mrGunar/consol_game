@@ -10,17 +10,16 @@ class Coordinate:
     y: int | None
 
 
+def check_coord(coord: Coordinate, check_list: list[Coordinate]) -> bool:
+    return coord in check_list
 
-class Coord:
-    @staticmethod
-    def check_coord(coord, check_list: list) -> bool:
-        return coord in check_list
 
-    @staticmethod
-    def generate_free_coord(check_list: list) -> Coordinate:
-        """Generate free coordinates"""
-        while 1:
-            x = random.randint(1, MapConfig.MAP_HEIGHT.value - 2) 
-            y = random.randint(1, MapConfig.MAP_WIDTH.value - 2)
-            if (x, y) not in check_list:
-                return Coordinate(x, y)
+def generate_free_coord(check_list: list[Coordinate]) -> Coordinate:
+    """Generate free coordinates"""
+    while 1:
+        x = random.randint(1, MapConfig.MAP_HEIGHT.value - 2)
+        y = random.randint(1, MapConfig.MAP_WIDTH.value - 2)
+        new_coords = Coordinate(x, y)
+
+        if new_coords not in check_list:
+            return new_coords

@@ -2,13 +2,12 @@ from enum import Enum
 
 
 class MapConfig(Enum):
-
     MAP_HEIGHT = 20
     MAP_WIDTH = 20
 
     COUNT_MONSTER = 3
 
-    BULLET_CELL = '*'
+    BULLET_CELL = "*"
     GRENADE_ICON = "+"
     BFG_CELL = "#"
 

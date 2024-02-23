@@ -6,10 +6,10 @@ from src.coordintate.coordinator import Coordinate
 
 
 class Direction(Enum):
-    UP = 'up',
-    DOWN = 'down',
-    LEFT = 'left',
-    RIGHT = 'right'
+    UP = ("up",)
+    DOWN = ("down",)
+    LEFT = ("left",)
+    RIGHT = "right"
 
 
 class Player(AliveObject):
@@ -18,7 +18,7 @@ class Player(AliveObject):
         self.bullet = 0
         self.icon = MapConfig.HUMAN_ICON.value
         self.last_direction = Direction.LEFT
-    
+
     def shoot(self):
         if self.bullet > 0:
             self.bullet -= 1
@@ -26,7 +26,6 @@ class Player(AliveObject):
     def get_bullet(self, count):
         self.bullet += count
 
-        
     def kill_player(self) -> None:
         self._is_alive = False
 
@@ -43,7 +42,6 @@ class Monster(AliveObject):
     def kill(self):
         self._is_alive = False
         self.icon = MapConfig.EMPTY_CELL.value
-
 
 
 class Bullet(WeaponObject):
