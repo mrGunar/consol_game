@@ -2,6 +2,7 @@ from enum import Enum
 
 from conf.map_config import MapConfig
 from src.objects.objects import AliveObject, WeaponObject
+from src.coordintate.coordinator import Coordinate
 
 
 class Direction(Enum):
@@ -12,7 +13,7 @@ class Direction(Enum):
 
 
 class Player(AliveObject):
-    def __init__(self, x=None, y=None) -> None:
+    def __init__(self, coords: Coordinate = Coordinate(None, None)) -> None:
         super().__init__(is_alive=True, is_object=False)
         self.bullet = 0
         self.icon = MapConfig.HUMAN_ICON.value
@@ -31,7 +32,7 @@ class Player(AliveObject):
 
 
 class Monster(AliveObject):
-    def __init__(self, x=None, y=None) -> None:
+    def __init__(self, coords: Coordinate = Coordinate(None, None)) -> None:
         super().__init__(is_alive=True, is_object=False)
         self.icon = MapConfig.MONSTER_ICON.value
 
@@ -46,21 +47,21 @@ class Monster(AliveObject):
 
 
 class Bullet(WeaponObject):
-    def __init__(self, x=None, y=None):
-        super().__init__(x, y)
+    def __init__(self, coords: Coordinate):
+        super().__init__(coords)
         self.icon = MapConfig.BULLET_CELL.value
 
 
 class Grenade(WeaponObject):
-    def __init__(self, x=None, y=None) -> None:
-        super().__init__(x, y)
+    def __init__(self, coords: Coordinate) -> None:
+        super().__init__(coords)
         self.icon = MapConfig.GRENADE_ICON.value
 
-    def explose(self, x, y, objs):
+    def explose(self, coords, objs):
         pass
 
 
 class BFG(WeaponObject):
-    def __init__(self, x=None, y=None) -> None:
-        super().__init__(x, y)
+    def __init__(self, coords: Coordinate) -> None:
+        super().__init__(coords)
         self.icon = MapConfig.BFG_CELL.value

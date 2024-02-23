@@ -26,10 +26,4 @@ class Map:
 
         for obj in objs:
             if obj.is_alive:
-                self._field[obj._x][obj._y] = obj.icon 
-
-    
-
-    
-
-
+                self._field[obj.x][obj.y] = obj.icon 

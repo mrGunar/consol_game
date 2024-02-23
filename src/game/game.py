@@ -1,13 +1,14 @@
 import os
 import random
 import typing
+import time
 
 from src.map.map import Map
-from src.coordintate.coordinator import Coord
+from src.coordintate.coordinator import Coord, Coordinate
 from conf.map_config import MapConfig
 from conf.phrases import Phrase
 from src.objects.game_object import Player, Monster, Direction, Bullet, Grenade, BFG
-from src.services import services
+from src.game.services import get_next_coord_for_monster
 
 
 class Game:
@@ -27,41 +28,28 @@ class Game:
         for obj in objs:
             coords = Coord.generate_free_coord(self.bussy_cells)
             self.bussy_cells.append(coords)
-            obj._x, obj._y = coords
+            obj.set_coords(coords)
 
-    def get_available_cord(self, x: int, y: int) -> tuple:
-        nei = [(1,1), (1,0), (-1,0), (-1,1), (-1,0), (-1,-1), (0, 1), (0, -1)]
-
-        res = {}
-        for i, j in nei:
-            dx = x - i
-            dy = y - j
-            if 0 < dx < MapConfig.MAP_HEIGHT.value and 0 < dy < MapConfig.MAP_WIDTH.value and \
-            self.map.fields[dx][dy] == MapConfig.EMPTY_CELL.value:
-                res.update({(dx, dy): services.get_distance_betwen_two_point(self.player.get_coords(), (dx,dy))})
-        coords = services.get_coords_from_dict(res)
-        return coords if coords is not None else (x, y)
-
-    def set_icon(self, x: int, y: int, icon) -> None:
-        self.map.fields[x][y] = icon
+    def set_icon(self, coords: Coordinate, icon) -> None:
+        self.map.fields[coords.x][coords.y] = icon
 
     def add_all_obj_to_map(self, objs) -> None:
         for obj in objs:
-            self.set_icon(obj._x, obj._y, obj.icon)
+            self.set_icon(obj.get_coords(), obj.icon)
 
     def monsters_step(self) -> None:
 
         random.shuffle(self.monsters)
 
         for x in self.monsters:
-            old_cords = (x._x, x._y)
+            old_cords = x.get_coords()
             self.bussy_cells.pop(self.bussy_cells.index(old_cords))
 
-            new_cords = self.get_available_cord(*x.get_coords())
+            new_cords = get_next_coord_for_monster(self.map, self.player, x.get_coords())
             self.bussy_cells.append(new_cords)
 
-            x.set_coords(*new_cords)
-            self.set_icon(*new_cords, x.icon)
+            x.set_coords(new_cords)
+            self.set_icon(new_cords, x.icon)
 
     def user_step(self, user_choice: str) -> None:
         match user_choice:
@@ -78,18 +66,18 @@ class Game:
                 self.player.step(0,1)
                 self.player.last_direction = Direction.RIGHT
             case "z":
-                bullet = Bullet(self.player._x, self.player._y)
+                bullet = Bullet(self.player.get_coords())
                 self.bullet_fly(bullet, self.player.last_direction)
             case "x":
-                grenade = Grenade(self.player._x, self.player._y)
+                grenade = Grenade(self.player.get_coords())
                 self.throw_grenade(grenade, self.player.last_direction)
             case "c":
-                bfg = BFG(self.player._x, self.player._y)
+                bfg = BFG(self.player.get_coords())
                 self.bfg_shoot(bfg, self.player.last_direction)
             case _:
                 print("Please repeat")
                 return self.user_step(input("W A S D: "))
-        self.set_icon(self.player._x, self.player._y, self.player.icon)
+        self.set_icon(self.player.get_coords(), self.player.icon)
 
 
     def bullet_fly(self, bullet, last_direction: str) -> None:
@@ -106,31 +94,30 @@ class Game:
             case Direction.LEFT:
                 dx, dy = (0,1)
 
-        while 0 < bullet._x < MapConfig.MAP_HEIGHT.value-1 and 0 < bullet._y < MapConfig.MAP_WIDTH.value-1:
-            bullet._x -= dx
-            bullet._y -= dy
+        while 0 < bullet.x < MapConfig.MAP_HEIGHT.value-1 and 0 < bullet.y < MapConfig.MAP_WIDTH.value-1:
+            bullet.change_coords(-dx, -dy)
             kill_status = self.check_status_for_bullet_fly(bullet)
-            self.set_icon(bullet._x, bullet._y, bullet.icon)
+            self.set_icon(bullet.get_coords(), bullet.icon)
             if kill_status:
                 break
             self.map.show_map()
-            import time;time.sleep(0.05)
+            time.sleep(0.05)
             os.system("cls")
 
     def check_status_for_bullet_fly(self, bullet) -> bool:
-        print(self.map.fields[bullet._x][bullet._y])
-        if self.map.fields[bullet._x][bullet._y] == MapConfig.MONSTER_ICON.value:
-            monster = self.find_monster_with_coord(bullet._x, bullet._y)
+        print(self.map.fields[bullet.x][bullet.y])
+        if self.map.fields[bullet.x][bullet.y] == MapConfig.MONSTER_ICON.value:
+            monster = self.find_monster_with_coord(bullet.x, bullet.y)
             if monster:
                 print("HEADSHOT")
-                import time;time.sleep(1)
+                time.sleep(1)
                 monster.kill()
                 return True
         return False
 
     def find_monster_with_coord(self, x: int, y: int) -> object:
         for m in self.monsters:
-            if (x, y) == (m._x, m._y):
+            if (x, y) == (m.x, m.y):
                 return m
 
     def check_game_status(self) -> typing.Tuple[bool, bool]:
@@ -143,8 +130,8 @@ class Game:
         nei = [(1,1), (1,0), (-1,0), (-1,1), (-1,0), (-1,-1), (0, 1), (0, -1)]
 
         for i, j in nei:
-            dx = self.player._x - i
-            dy = self.player._y - j
+            dx = self.player.x - i
+            dy = self.player.y - j
             if 0 < dx < MapConfig.MAP_HEIGHT.value and 0 < dy < MapConfig.MAP_WIDTH.value and \
             self.map.fields[dx][dy] == MapConfig.MONSTER_ICON.value:
                 self.player.kill_player()
@@ -161,7 +148,7 @@ class Game:
             case Direction.LEFT:
                 dx, dy = (0,d)
 
-        grenade.change_coords(grenade.x - dx, grenade.y -dy)
+        grenade.change_coords(-dx, -dy)
 
         self.explose_grenade(grenade)
 
@@ -174,17 +161,17 @@ class Game:
             dy = gren.y - j
             if 0 < dx < MapConfig.MAP_HEIGHT.value and 0 < dy < MapConfig.MAP_WIDTH.value and \
                 self.map.fields[dx][dy] != MapConfig.BORDER_CELL.value:
-                self.set_icon(dx, dy, gren.icon)
+                self.set_icon(Coordinate(dx, dy), gren.icon)
                 monster = self.find_monster_with_coord(dx, dy)
                 if monster:
                     monster.kill()
                     c += 1
                 os.system("cls")
                 self.map.show_map()
-                import time;time.sleep(0.2)
+                time.sleep(0.2)
 
         print(f"YOU KILL {c} MONSTERS")
-        import time;time.sleep(1)
+        time.sleep(1)
 
 
     def bfg_shoot(self, bfg, last_direction):
@@ -200,24 +187,23 @@ class Game:
 
 
         
-        while 0 < bfg._x < MapConfig.MAP_HEIGHT.value-1 and 0 < bfg._y < MapConfig.MAP_WIDTH.value-1:
+        while 0 < bfg.x < MapConfig.MAP_HEIGHT.value-1 and 0 < bfg.y < MapConfig.MAP_WIDTH.value-1:
             for i, j in dd:
                 dx = bfg.x - i
                 dy = bfg.y - j
                 if 0 < dx < MapConfig.MAP_HEIGHT.value and 0 < dy < MapConfig.MAP_WIDTH.value and \
                     self.map.fields[dx][dy] != MapConfig.BORDER_CELL.value:
-                    self.set_icon(dx, dy, bfg.icon)
+                    self.set_icon(Coordinate(dx, dy), bfg.icon)
                     monster = self.find_monster_with_coord(dx, dy)
                     if monster:
                         monster.kill()
                         
                     os.system("cls")
                     self.map.show_map()
-                    import time;time.sleep(0.05)
-            bfg.change_coords(bfg.x - dd[0][0], bfg.y - dd[0][1])
-            print("HUIHDJGSH")
+                    time.sleep(0.05)
+            bfg.change_coords(-dd[0][0], -dd[0][1])
 
-        import time;time.sleep(1)
+        time.sleep(1)
 
                 
     def run(self) -> None:
