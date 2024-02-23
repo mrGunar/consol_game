@@ -1,6 +1,7 @@
-from conf import Config
 from enum import Enum
-from objects import AliveObject, WeaponObject
+
+from conf.map_config import MapConfig
+from src.objects.objects import AliveObject, WeaponObject
 
 
 class Direction(Enum):
@@ -14,7 +15,7 @@ class Player(AliveObject):
     def __init__(self, x=None, y=None) -> None:
         super().__init__(is_alive=True, is_object=False)
         self.bullet = 0
-        self.icon = Config.HUMAN_ICON.value
+        self.icon = MapConfig.HUMAN_ICON.value
         self.last_direction = Direction.LEFT
     
     def shoot(self):
@@ -32,7 +33,7 @@ class Player(AliveObject):
 class Monster(AliveObject):
     def __init__(self, x=None, y=None) -> None:
         super().__init__(is_alive=True, is_object=False)
-        self.icon = Config.MONSTER_ICON.value
+        self.icon = MapConfig.MONSTER_ICON.value
 
     @classmethod
     def create_monster(cls):
@@ -40,20 +41,20 @@ class Monster(AliveObject):
 
     def kill(self):
         self._is_alive = False
-        self.icon = Config.EMPTY_CELL.value
+        self.icon = MapConfig.EMPTY_CELL.value
 
 
 
 class Bullet(WeaponObject):
     def __init__(self, x=None, y=None):
         super().__init__(x, y)
-        self.icon = Config.BULLET_CELL.value
+        self.icon = MapConfig.BULLET_CELL.value
 
 
 class Grenade(WeaponObject):
     def __init__(self, x=None, y=None) -> None:
         super().__init__(x, y)
-        self.icon = Config.GRENADE_ICON.value
+        self.icon = MapConfig.GRENADE_ICON.value
 
     def explose(self, x, y, objs):
         pass
@@ -62,4 +63,4 @@ class Grenade(WeaponObject):
 class BFG(WeaponObject):
     def __init__(self, x=None, y=None) -> None:
         super().__init__(x, y)
-        self.icon = Config.BFG_CELL.value
+        self.icon = MapConfig.BFG_CELL.value

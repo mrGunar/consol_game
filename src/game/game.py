@@ -1,12 +1,14 @@
-from map import Map
-from coordinator import Coord
-from conf import Config, Phrase
+import os
 import random
 import typing
-from game_object import Player, Monster, Direction, Bullet, Grenade, BFG
-import services
 
-import os
+from src.map.map import Map
+from src.coordintate.coordinator import Coord
+from conf.map_config import MapConfig
+from conf.phrases import Phrase
+from src.objects.game_object import Player, Monster, Direction, Bullet, Grenade, BFG
+from src.services import services
+
 
 class Game:
 
@@ -34,14 +36,10 @@ class Game:
         for i, j in nei:
             dx = x - i
             dy = y - j
-            if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
-            self.map.fields[dx][dy] == Config.EMPTY_CELL.value:
-                # res.append((dx, dy))
+            if 0 < dx < MapConfig.MAP_HEIGHT.value and 0 < dy < MapConfig.MAP_WIDTH.value and \
+            self.map.fields[dx][dy] == MapConfig.EMPTY_CELL.value:
                 res.update({(dx, dy): services.get_distance_betwen_two_point(self.player.get_coords(), (dx,dy))})
-        # import pdb;pdb.set_trace()
         coords = services.get_coords_from_dict(res)
-        # return random.choice(res) if res else (x, y)
-        # import pdb;pdb.set_trace()
         return coords if coords is not None else (x, y)
 
     def set_icon(self, x: int, y: int, icon) -> None:
@@ -108,7 +106,7 @@ class Game:
             case Direction.LEFT:
                 dx, dy = (0,1)
 
-        while 0 < bullet._x < Config.MAP_HEIGHT.value-1 and 0 < bullet._y < Config.MAP_WIDTH.value-1:
+        while 0 < bullet._x < MapConfig.MAP_HEIGHT.value-1 and 0 < bullet._y < MapConfig.MAP_WIDTH.value-1:
             bullet._x -= dx
             bullet._y -= dy
             kill_status = self.check_status_for_bullet_fly(bullet)
@@ -121,7 +119,7 @@ class Game:
 
     def check_status_for_bullet_fly(self, bullet) -> bool:
         print(self.map.fields[bullet._x][bullet._y])
-        if self.map.fields[bullet._x][bullet._y] == Config.MONSTER_ICON.value:
+        if self.map.fields[bullet._x][bullet._y] == MapConfig.MONSTER_ICON.value:
             monster = self.find_monster_with_coord(bullet._x, bullet._y)
             if monster:
                 print("HEADSHOT")
@@ -147,8 +145,8 @@ class Game:
         for i, j in nei:
             dx = self.player._x - i
             dy = self.player._y - j
-            if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
-            self.map.fields[dx][dy] == Config.MONSTER_ICON.value:
+            if 0 < dx < MapConfig.MAP_HEIGHT.value and 0 < dy < MapConfig.MAP_WIDTH.value and \
+            self.map.fields[dx][dy] == MapConfig.MONSTER_ICON.value:
                 self.player.kill_player()
 
     def throw_grenade(self,grenade, last_direction, d=3):
@@ -174,8 +172,8 @@ class Game:
         for i, j in nei:
             dx = gren.x - i
             dy = gren.y - j
-            if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
-                self.map.fields[dx][dy] != Config.BORDER_CELL.value:
+            if 0 < dx < MapConfig.MAP_HEIGHT.value and 0 < dy < MapConfig.MAP_WIDTH.value and \
+                self.map.fields[dx][dy] != MapConfig.BORDER_CELL.value:
                 self.set_icon(dx, dy, gren.icon)
                 monster = self.find_monster_with_coord(dx, dy)
                 if monster:
@@ -202,12 +200,12 @@ class Game:
 
 
         
-        while 0 < bfg._x < Config.MAP_HEIGHT.value-1 and 0 < bfg._y < Config.MAP_WIDTH.value-1:
+        while 0 < bfg._x < MapConfig.MAP_HEIGHT.value-1 and 0 < bfg._y < MapConfig.MAP_WIDTH.value-1:
             for i, j in dd:
                 dx = bfg.x - i
                 dy = bfg.y - j
-                if 0 < dx < Config.MAP_HEIGHT.value and 0 < dy < Config.MAP_WIDTH.value and \
-                    self.map.fields[dx][dy] != Config.BORDER_CELL.value:
+                if 0 < dx < MapConfig.MAP_HEIGHT.value and 0 < dy < MapConfig.MAP_WIDTH.value and \
+                    self.map.fields[dx][dy] != MapConfig.BORDER_CELL.value:
                     self.set_icon(dx, dy, bfg.icon)
                     monster = self.find_monster_with_coord(dx, dy)
                     if monster:
@@ -252,5 +250,3 @@ class Game:
             self.map.draw_map(self.all_objects)
 
             os.system("cls")
-
-        

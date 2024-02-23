@@ -18,6 +18,5 @@ def get_coords_from_dict(dd: dict) -> tuple:
             min_coords = k
             min_v = v
 
-    # import pdb;pdb.set_trace()
     return min_coords
 

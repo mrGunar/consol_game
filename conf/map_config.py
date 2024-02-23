@@ -1,10 +1,10 @@
 from enum import Enum
 
 
-class Config(Enum):
+class MapConfig(Enum):
 
-    MAP_HEIGHT = 35
-    MAP_WIDTH = 35
+    MAP_HEIGHT = 20
+    MAP_WIDTH = 20
 
     COUNT_MONSTER = 3
 
@@ -17,13 +17,3 @@ class Config(Enum):
     MONSTER_ICON = "M"
     HUMAN_ICON = "Y"
     ARMOUR_ICON = "W"
-    
-
-
-class Phrase(Enum):
-
-    LOSE = "GAME OVER! YOU LOSE"
-    WIN = "GAME OVER! You win" 
-    EXIT = "Press any key..."
-
-    MONSTERS_REMAIN = "MONSTERS REMAINING"

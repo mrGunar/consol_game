@@ -1,4 +1,4 @@
-from conf import Config
+from conf.map_config import MapConfig
 
 
 class AliveObject:
@@ -16,8 +16,7 @@ class AliveObject:
         self._y = y
 
     def step(self, x: int, y: int) -> None:
-        # import pdb;pdb.set_trace()
-        if 0 < self._x+x < Config.MAP_HEIGHT.value-1 and 0 < self._y+y < Config.MAP_WIDTH.value-1:
+        if 0 < self._x+x < MapConfig.MAP_HEIGHT.value-1 and 0 < self._y+y < MapConfig.MAP_WIDTH.value-1:
             self._x += x
             self._y += y
 
