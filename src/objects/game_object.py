@@ -1,14 +1,15 @@
 from enum import Enum
 
 from conf.map_config import MapConfig
-from src.objects.objects import AliveObject, WeaponObject
+from src.objects.alive_objects import AliveObject
+from src.objects.weapon import WeaponObject
 from src.coordintate.coordinator import Coordinate
 
 
 class Direction(Enum):
-    UP = ("up",)
-    DOWN = ("down",)
-    LEFT = ("left",)
+    UP = "up"
+    DOWN = "down"
+    LEFT = "left"
     RIGHT = "right"
 
 

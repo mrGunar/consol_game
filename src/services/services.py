@@ -9,7 +9,7 @@ def get_distance_betwen_two_point(point_one: Coordinate, point_two: Coordinate) 
     return round(math.sqrt((abs(x1 - x2)) ** 2 + (abs(y1 - y2)) ** 2), 1)
 
 
-def get_coords_from_dict(dd: dict) -> Coordinate:
+def get_coords_from_dict(dd: dict) -> Coordinate | None:
     min_v = math.inf
     min_coords = None
 
@@ -17,4 +17,5 @@ def get_coords_from_dict(dd: dict) -> Coordinate:
         if v < min_v:
             min_coords = k
             min_v = v
-    return Coordinate(*min_coords)
+    if min_coords is not None:
+        return Coordinate(*min_coords)

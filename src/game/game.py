@@ -8,7 +8,7 @@ from src.coordintate.coordinator import Coordinate, generate_free_coord
 from conf.map_config import MapConfig
 from conf.phrases import Phrase
 from src.objects.game_object import Player, Monster, Direction, Bullet, Grenade, BFG
-from src.game.services import get_next_coord_for_monster
+from src.game.services import get_next_coord_for_monster, is_move_valid
 
 
 class Game:
@@ -54,17 +54,25 @@ class Game:
     def user_step(self, user_choice: str) -> None:
         match user_choice:
             case "w":
-                self.player.step(-1, 0)
-                self.player.last_direction = Direction.UP
+                bias = Coordinate(-1, 0)
+                if is_move_valid(self.player.get_coords(), bias):
+                    self.player.step(bias)
+                    self.player.last_direction = Direction.UP
             case "a":
-                self.player.step(0, -1)
-                self.player.last_direction = Direction.LEFT
+                bias = Coordinate(0, -1)
+                if is_move_valid(self.player.get_coords(), bias):
+                    self.player.step(bias)
+                    self.player.last_direction = Direction.LEFT
             case "s":
-                self.player.step(1, 0)
-                self.player.last_direction = Direction.DOWN
+                bias = Coordinate(1, 0)
+                if is_move_valid(self.player.get_coords(), bias):
+                    self.player.step(bias)
+                    self.player.last_direction = Direction.DOWN
             case "d":
-                self.player.step(0, 1)
-                self.player.last_direction = Direction.RIGHT
+                bias = Coordinate(0, 1)
+                if is_move_valid(self.player.get_coords(), bias):
+                    self.player.step(bias)
+                    self.player.last_direction = Direction.RIGHT
             case "z":
                 bullet = Bullet(self.player.get_coords())
                 self.bullet_fly(bullet, self.player.last_direction)
@@ -97,7 +105,7 @@ class Game:
             0 < bullet.x < MapConfig.MAP_HEIGHT.value - 1
             and 0 < bullet.y < MapConfig.MAP_WIDTH.value - 1
         ):
-            bullet.change_coords(-dx, -dy)
+            bullet.set_coords(Coordinate(-dx, -dy))
             kill_status = self.check_status_for_bullet_fly(bullet)
             self.set_icon(bullet.get_coords(), bullet.icon)
             if kill_status:
@@ -152,7 +160,7 @@ class Game:
             case Direction.LEFT:
                 dx, dy = (0, d)
 
-        grenade.change_coords(-dx, -dy)
+        grenade.set_coords(Coordinate(-dx, -dy))
 
         self.explose_grenade(grenade)
 
@@ -221,7 +229,7 @@ class Game:
                     os.system("cls")
                     self.map.show_map()
                     time.sleep(0.05)
-            bfg.change_coords(-dd[0][0], -dd[0][1])
+            bfg.set_coords(Coordinate(-dd[0][0], -dd[0][1]))
 
         time.sleep(1)
 
@@ -246,8 +254,10 @@ class Game:
 
                 if player_status or not monster_status:
                     input(f"{Phrase.WIN.value}\n{Phrase.EXIT.value}")
+                    exit()
                 else:
                     input(f"{Phrase.LOSE.value}\n{Phrase.EXIT.value}")
+                    exit()
 
             self.monsters_step()
             self.add_all_obj_to_map(self.all_objects)
