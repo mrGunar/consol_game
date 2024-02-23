@@ -14,7 +14,9 @@ class AliveObject(Object):
         self._coordinates = coords
 
     def step(self, bias: Coordinate) -> None:
-        self._coordinates = Coordinate(self._coordinates.x + bias.x, self._coordinates.y + bias.y)
+        self._coordinates = Coordinate(
+            self._coordinates.x + bias.x, self._coordinates.y + bias.y
+        )
 
     @property
     def is_alive(self):

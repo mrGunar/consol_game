@@ -4,7 +4,7 @@ from src.coordintate.coordinator import Coordinate
 class Object:
     def __init__(self, coordinates: Coordinate):
         self._coordinates = coordinates
-    
+
     def get_coords(self) -> Coordinate:
         return self._coordinates
 

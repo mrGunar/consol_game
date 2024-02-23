@@ -25,5 +25,10 @@ def get_next_coord_for_monster(map, player, monster_coords: Coordinate) -> Coord
     coords = services.get_coords_from_dict(res)
     return coords if coords is not None else monster_coords
 
-def is_move_valid(object_coords: Coordinate, bias_coords: Coordinate):
-    return 0 < object_coords.x + bias_coords.x < MapConfig.MAP_HEIGHT.value - 1 and 0 < object_coords.y + bias_coords.y < MapConfig.MAP_WIDTH.value - 1
+
+def is_move_valid(coords: Coordinate, _map) -> bool:
+    return (
+            0 < coords.x < MapConfig.MAP_HEIGHT.value - 1
+            and 0 < coords.y < MapConfig.MAP_WIDTH.value - 1
+            and _map.fields[coords.x][coords.y] != MapConfig.BORDER_CELL.value
+            )

@@ -10,6 +10,40 @@ from conf.phrases import Phrase
 from src.objects.game_object import Player, Monster, Direction, Bullet, Grenade, BFG
 from src.game.services import get_next_coord_for_monster, is_move_valid
 
+class BiasCoords:
+    LEFT = Coordinate(0, -1)
+    RIGHT = Coordinate(0, 1)
+    UP = Coordinate(-1, 0)
+    DOWN = Coordinate(1, 0)
+
+class PlayerCommands:
+    def __init__(self, player, map):
+        self.player = player
+        self.map = map
+        
+    def move_up(self):
+        bias = self.player.get_coords() + BiasCoords.UP
+        if is_move_valid(bias, self.map):
+            self.player.step(BiasCoords.UP)
+            self.player.last_direction = Direction.UP
+    
+    def move_left(self):
+        bias = self.player.get_coords() + BiasCoords.LEFT
+        if is_move_valid(bias, self.map):
+            self.player.step(BiasCoords.LEFT)
+            self.player.last_direction = Direction.LEFT
+    
+    def move_down(self):
+        bias = self.player.get_coords() + BiasCoords.DOWN
+        if is_move_valid(bias, self.map):
+            self.player.step(BiasCoords.DOWN)
+            self.player.last_direction = Direction.DOWN
+
+    def move_right(self):
+        bias = self.player.get_coords() + BiasCoords.RIGHT
+        if is_move_valid(bias, self.map):
+            self.player.step(BiasCoords.RIGHT)
+            self.player.last_direction = Direction.RIGHT
 
 class Game:
     game = True
@@ -22,6 +56,7 @@ class Game:
         self.monsters = [x for x in self.monsters if x.is_alive]
         self.all_objects = [self.player] + self.monsters
         self.set_coords_to_obj(self.all_objects)
+        self.player_commands = PlayerCommands(self.player, self.map)
 
     def set_coords_to_obj(self, objs) -> None:
         for obj in objs:
@@ -54,25 +89,13 @@ class Game:
     def user_step(self, user_choice: str) -> None:
         match user_choice:
             case "w":
-                bias = Coordinate(-1, 0)
-                if is_move_valid(self.player.get_coords(), bias):
-                    self.player.step(bias)
-                    self.player.last_direction = Direction.UP
+                self.player_commands.move_up()
             case "a":
-                bias = Coordinate(0, -1)
-                if is_move_valid(self.player.get_coords(), bias):
-                    self.player.step(bias)
-                    self.player.last_direction = Direction.LEFT
+                self.player_commands.move_left()
             case "s":
-                bias = Coordinate(1, 0)
-                if is_move_valid(self.player.get_coords(), bias):
-                    self.player.step(bias)
-                    self.player.last_direction = Direction.DOWN
+                self.player_commands.move_down()
             case "d":
-                bias = Coordinate(0, 1)
-                if is_move_valid(self.player.get_coords(), bias):
-                    self.player.step(bias)
-                    self.player.last_direction = Direction.RIGHT
+                self.player_commands.move_right()
             case "z":
                 bullet = Bullet(self.player.get_coords())
                 self.bullet_fly(bullet, self.player.last_direction)
@@ -100,12 +123,10 @@ class Game:
                 dx, dy = (0, -1)
             case Direction.LEFT:
                 dx, dy = (0, 1)
-
-        while (
-            0 < bullet.x < MapConfig.MAP_HEIGHT.value - 1
-            and 0 < bullet.y < MapConfig.MAP_WIDTH.value - 1
-        ):
-            bullet.set_coords(Coordinate(-dx, -dy))
+        coords = Coordinate(-dx, -dy)
+        
+        while is_move_valid(bullet.get_coords(), self.map):
+            bullet.set_coords(coords)
             kill_status = self.check_status_for_bullet_fly(bullet)
             self.set_icon(bullet.get_coords(), bullet.icon)
             if kill_status:
@@ -181,11 +202,7 @@ class Game:
         for i, j in nei:
             dx = gren.x - i
             dy = gren.y - j
-            if (
-                0 < dx < MapConfig.MAP_HEIGHT.value
-                and 0 < dy < MapConfig.MAP_WIDTH.value
-                and self.map.fields[dx][dy] != MapConfig.BORDER_CELL.value
-            ):
+            if is_move_valid(Coordinate(dx, dy), self.map):
                 self.set_icon(Coordinate(dx, dy), gren.icon)
                 monster = self.find_monster_with_coord(dx, dy)
                 if monster:

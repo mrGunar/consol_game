@@ -9,13 +9,15 @@ class Coordinate:
     x: int | None
     y: int | None
 
+    def __add__(self, other: "Coordinate"):
+        return Coordinate(self.x + other.x, self.y + other.y)
 
 def check_coord(coord: Coordinate, check_list: list[Coordinate]) -> bool:
     return coord in check_list
 
 
 def generate_free_coord(check_list: list[Coordinate]) -> Coordinate:
-    """Generate free coordinates"""
+    """Generate free coordinates."""
     while 1:
         x = random.randint(1, MapConfig.MAP_HEIGHT.value - 2)
         y = random.randint(1, MapConfig.MAP_WIDTH.value - 2)
