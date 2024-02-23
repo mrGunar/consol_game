@@ -8,13 +8,15 @@ from src.coordintate.coordinator import Coordinate, generate_free_coord
 from conf.map_config import MapConfig
 from conf.phrases import Phrase
 from src.objects.game_object import Player, Monster, Direction, Bullet, Grenade, BFG
-from src.game.services import get_next_coord_for_monster, is_move_valid
+from src.game.services import get_next_coord_for_monster, is_move_valid, find_monster_with_coord
+
 
 class BiasCoords:
     LEFT = Coordinate(0, -1)
     RIGHT = Coordinate(0, 1)
     UP = Coordinate(-1, 0)
     DOWN = Coordinate(1, 0)
+
 
 class PlayerCommands:
     def __init__(self, player, map):
@@ -44,6 +46,54 @@ class PlayerCommands:
         if is_move_valid(bias, self.map):
             self.player.step(BiasCoords.RIGHT)
             self.player.last_direction = Direction.RIGHT
+    
+    def shoot_bullet(self):
+        bullet = Bullet(self.player.get_coords())
+        self.bullet_command = BulletCommand(bullet, self.map)
+        self.bullet_command.bullet_fly(self.player.last_direction)
+
+
+class BulletCommand:
+    def __init__(self, bullet, _map):
+        self.bullet = bullet
+        self.map = _map
+    
+    def bullet_fly(self, direction: str) -> None:
+        dx = 0
+        dy = 0
+
+        match direction:
+            case Direction.UP:
+                dx, dy = (1, 0)
+            case Direction.DOWN:
+                dx, dy = (-1, 0)
+            case Direction.RIGHT:
+                dx, dy = (0, -1)
+            case Direction.LEFT:
+                dx, dy = (0, 1)
+        coords = Coordinate(-dx, -dy)
+        
+        while is_move_valid(self.bullet.get_coords(), self.map):
+            self.bullet.set_coords(coords)
+            kill_status = self.check_status_for_bullet_fly()
+            self.map.set_icon(self.bullet.get_coords(), self.bullet.icon)
+            if kill_status:
+                break
+            self.map.show_map()
+            time.sleep(0.05)
+            os.system("cls")
+
+    def check_status_for_bullet_fly(self) -> bool:
+        print(self.map.fields[self.bullet.x][self.bullet.y])
+        if self.map.fields[self.bullet.x][self.bullet.y] == MapConfig.MONSTER_ICON.value:
+            monster = find_monster_with_coord(self.bullet.x, self.bullet.y, self.map)
+            if monster:
+                print("HEADSHOT")
+                time.sleep(1)
+                monster.kill()
+                return True
+        return False
+
 
 class Game:
     game = True
@@ -52,11 +102,20 @@ class Game:
         self.bussy_cells = list()
         self.map = Map()
         self.player = Player()
+        self.player_commands = PlayerCommands(self.player, self.map)
+        self.create_monsters(count_monsters)
+        self.init()
+    
+    def create_monsters(self, count_monsters):
         self.monsters = [Monster.create_monster() for _ in range(count_monsters)]
         self.monsters = [x for x in self.monsters if x.is_alive]
+        random.shuffle(self.monsters)
+        self.map.add_monsters(self.monsters)
+
+    def init(self):
         self.all_objects = [self.player] + self.monsters
-        self.set_coords_to_obj(self.all_objects)
-        self.player_commands = PlayerCommands(self.player, self.map)
+        self.set_coords_to_obj(self.all_objects)       
+        self.add_all_obj_to_map(self.all_objects)    
 
     def set_coords_to_obj(self, objs) -> None:
         for obj in objs:
@@ -64,15 +123,11 @@ class Game:
             self.bussy_cells.append(coords)
             obj.set_coords(coords)
 
-    def set_icon(self, coords: Coordinate, icon) -> None:
-        self.map.fields[coords.x][coords.y] = icon
-
     def add_all_obj_to_map(self, objs) -> None:
         for obj in objs:
-            self.set_icon(obj.get_coords(), obj.icon)
+            self.map.set_icon(obj.get_coords(), obj.icon)
 
     def monsters_step(self) -> None:
-        random.shuffle(self.monsters)
 
         for x in self.monsters:
             old_cords = x.get_coords()
@@ -84,7 +139,7 @@ class Game:
             self.bussy_cells.append(new_cords)
 
             x.set_coords(new_cords)
-            self.set_icon(new_cords, x.icon)
+            self.map.set_icon(new_cords, x.icon)
 
     def user_step(self, user_choice: str) -> None:
         match user_choice:
@@ -97,8 +152,7 @@ class Game:
             case "d":
                 self.player_commands.move_right()
             case "z":
-                bullet = Bullet(self.player.get_coords())
-                self.bullet_fly(bullet, self.player.last_direction)
+                self.player_commands.shoot_bullet()
             case "x":
                 grenade = Grenade(self.player.get_coords())
                 self.throw_grenade(grenade, self.player.last_direction)
@@ -108,48 +162,8 @@ class Game:
             case _:
                 print("Please repeat")
                 return self.user_step(input("W A S D: "))
-        self.set_icon(self.player.get_coords(), self.player.icon)
+        self.map.set_icon(self.player.get_coords(), self.player.icon)
 
-    def bullet_fly(self, bullet, last_direction: str) -> None:
-        dx = 0
-        dy = 0
-
-        match last_direction:
-            case Direction.UP:
-                dx, dy = (1, 0)
-            case Direction.DOWN:
-                dx, dy = (-1, 0)
-            case Direction.RIGHT:
-                dx, dy = (0, -1)
-            case Direction.LEFT:
-                dx, dy = (0, 1)
-        coords = Coordinate(-dx, -dy)
-        
-        while is_move_valid(bullet.get_coords(), self.map):
-            bullet.set_coords(coords)
-            kill_status = self.check_status_for_bullet_fly(bullet)
-            self.set_icon(bullet.get_coords(), bullet.icon)
-            if kill_status:
-                break
-            self.map.show_map()
-            time.sleep(0.05)
-            os.system("cls")
-
-    def check_status_for_bullet_fly(self, bullet) -> bool:
-        print(self.map.fields[bullet.x][bullet.y])
-        if self.map.fields[bullet.x][bullet.y] == MapConfig.MONSTER_ICON.value:
-            monster = self.find_monster_with_coord(bullet.x, bullet.y)
-            if monster:
-                print("HEADSHOT")
-                time.sleep(1)
-                monster.kill()
-                return True
-        return False
-
-    def find_monster_with_coord(self, x: int, y: int) -> object:
-        for m in self.monsters:
-            if (x, y) == (m.x, m.y):
-                return m
 
     def check_game_status(self) -> typing.Tuple[bool, bool]:
         available_monster = True if [x for x in self.monsters if x.is_alive] else False
@@ -203,8 +217,8 @@ class Game:
             dx = gren.x - i
             dy = gren.y - j
             if is_move_valid(Coordinate(dx, dy), self.map):
-                self.set_icon(Coordinate(dx, dy), gren.icon)
-                monster = self.find_monster_with_coord(dx, dy)
+                self.map.set_icon(Coordinate(dx, dy), gren.icon)
+                monster = find_monster_with_coord(dx, dy, self.map)
                 if monster:
                     monster.kill()
                     c += 1
@@ -238,8 +252,8 @@ class Game:
                     and 0 < dy < MapConfig.MAP_WIDTH.value
                     and self.map.fields[dx][dy] != MapConfig.BORDER_CELL.value
                 ):
-                    self.set_icon(Coordinate(dx, dy), bfg.icon)
-                    monster = self.find_monster_with_coord(dx, dy)
+                    self.map.set_icon(Coordinate(dx, dy), bfg.icon)
+                    monster = find_monster_with_coord(dx, dy, self.map)
                     if monster:
                         monster.kill()
 
@@ -251,8 +265,8 @@ class Game:
         time.sleep(1)
 
     def run(self) -> None:
-        self.add_all_obj_to_map(self.all_objects)
         monster_status, player_status = True, True
+
         while Game.game:
             self.map.show_map()
             if not player_status:
@@ -275,7 +289,7 @@ class Game:
                 else:
                     input(f"{Phrase.LOSE.value}\n{Phrase.EXIT.value}")
                     exit()
-
+                    
             self.monsters_step()
             self.add_all_obj_to_map(self.all_objects)
 

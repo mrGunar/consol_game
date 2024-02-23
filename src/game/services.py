@@ -32,3 +32,8 @@ def is_move_valid(coords: Coordinate, _map) -> bool:
             and 0 < coords.y < MapConfig.MAP_WIDTH.value - 1
             and _map.fields[coords.x][coords.y] != MapConfig.BORDER_CELL.value
             )
+
+def find_monster_with_coord(x: int, y: int, map) -> object:
+    for m in map.monsters:
+        if (x, y) == (m.x, m.y):
+            return m

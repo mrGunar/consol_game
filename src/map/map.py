@@ -1,4 +1,5 @@
 from conf.map_config import MapConfig
+from src.coordintate.coordinator import Coordinate
 
 
 class Map:
@@ -7,6 +8,7 @@ class Map:
             ["_" for _ in range(MapConfig.MAP_HEIGHT.value)]
             for _ in range(MapConfig.MAP_WIDTH.value)
         ]
+        self.monsters = None
         self._field = self.generate_map_board(self._field)
 
     def generate_map_board(self, f):
@@ -33,3 +35,9 @@ class Map:
         for obj in objs:
             if obj.is_alive:
                 self._field[obj.x][obj.y] = obj.icon
+
+    def add_monsters(self, monsters):
+        self.monsters = monsters
+    
+    def set_icon(self, coords: Coordinate, icon) -> None:
+        self.fields[coords.x][coords.y] = icon
