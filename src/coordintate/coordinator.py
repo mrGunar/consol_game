@@ -9,8 +9,11 @@ class Coordinate:
     x: int | None
     y: int | None
 
-    def __add__(self, other: "Coordinate"):
+    def __add__(self, other: "Coordinate") -> "Coordinate":
         return Coordinate(self.x + other.x, self.y + other.y)
+    
+    def __eq__(self, other: "Coordinate") -> bool:
+        return self.x == other.x and self.y == other.y
 
 def check_coord(coord: Coordinate, check_list: list[Coordinate]) -> bool:
     return coord in check_list

@@ -59,19 +59,16 @@ class BulletCommand:
         self.map = _map
     
     def bullet_fly(self, direction: str) -> None:
-        dx = 0
-        dy = 0
 
         match direction:
             case Direction.UP:
-                dx, dy = (1, 0)
+                coords = BiasCoords.UP
             case Direction.DOWN:
-                dx, dy = (-1, 0)
+                coords = BiasCoords.DOWN
             case Direction.RIGHT:
-                dx, dy = (0, -1)
+                coords = BiasCoords.RIGHT
             case Direction.LEFT:
-                dx, dy = (0, 1)
-        coords = Coordinate(-dx, -dy)
+                coords = BiasCoords.LEFT
         
         while is_move_valid(self.bullet.get_coords(), self.map):
             self.bullet.set_coords(coords)
@@ -84,11 +81,10 @@ class BulletCommand:
             os.system("cls")
 
     def check_status_for_bullet_fly(self) -> bool:
-        print(self.map.fields[self.bullet.x][self.bullet.y])
         if self.map.fields[self.bullet.x][self.bullet.y] == MapConfig.MONSTER_ICON.value:
-            monster = find_monster_with_coord(self.bullet.x, self.bullet.y, self.map)
+            monster = find_monster_with_coord(self.bullet.get_coords(), self.map.monsters)
             if monster:
-                print("HEADSHOT")
+                print("~~HEADSHOT~~")
                 time.sleep(1)
                 monster.kill()
                 return True
@@ -159,6 +155,8 @@ class Game:
             case "c":
                 bfg = BFG(self.player.get_coords())
                 self.bfg_shoot(bfg, self.player.last_direction)
+            case "q":
+                exit()
             case _:
                 print("Please repeat")
                 return self.user_step(input("W A S D: "))
