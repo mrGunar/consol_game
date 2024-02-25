@@ -28,10 +28,11 @@ def get_next_coord_for_monster(map, player, monster_coords: Coordinate) -> Coord
 
 def is_move_valid(coords: Coordinate, _map) -> bool:
     return (
-            0 < coords.x < MapConfig.MAP_HEIGHT.value - 1
-            and 0 < coords.y < MapConfig.MAP_WIDTH.value - 1
-            and _map.fields[coords.x][coords.y] != MapConfig.BORDER_CELL.value
-            )
+        0 < coords.x < MapConfig.MAP_HEIGHT.value - 1
+        and 0 < coords.y < MapConfig.MAP_WIDTH.value - 1
+        and _map.fields[coords].icon != MapConfig.BORDER_CELL.value
+    )
+
 
 def find_monster_with_coord(coords: Coordinate, monsters: list) -> object:
     for monster in monsters:
