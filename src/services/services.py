@@ -13,9 +13,10 @@ def get_coords_from_dict(dd: dict) -> Coordinate | None:
     min_v = math.inf
     min_coords = None
 
-    for k, v in dd.items():
+    for coord, v in dd.items():
         if v < min_v:
-            min_coords = k
+            min_coords = coord
             min_v = v
+
     if min_coords is not None:
-        return Coordinate(*min_coords)
+        return min_coords

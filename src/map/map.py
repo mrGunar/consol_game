@@ -1,51 +1,74 @@
 from conf.map_config import MapConfig
 from src.coordintate.coordinator import Coordinate
-
-
-class Cell:
-    obj: int
-    coords: Coordinate
-        
+from src.objects.map_objects import EmptyCell
+from src.objects.monster import Monster
+from src.objects.player import Player
+from src.map.fields import FieldsCreator
 
 
 class Map:
     def __init__(self) -> None:
-        self._fields = [
-            ["_" for _ in range(MapConfig.MAP_HEIGHT.value)]
-            for _ in range(MapConfig.MAP_WIDTH.value)
-        ]
+        self._fields = None
         self._monsters = None
         self._player = None
-        self._objects = None
-        self._fields = self.generate_map_board(self._fields)
 
-    def generate_map_board(self, f):
-        f[0] = f[-1] = [MapConfig.BORDER_CELL.value] * MapConfig.MAP_HEIGHT.value
-        for el in f:
-            el[0] = el[-1] = MapConfig.BORDER_CELL.value
-        return f
-
-    def show_map(self):
-        for row in self._fields:
-            print(*row)
+        self.map_actions = MapAction(self)
 
     @property
     def fields(self):
         return self._fields
 
-    def draw_map(self, objs):
-        self._fields = [
-            ["_" for _ in range(MapConfig.MAP_HEIGHT.value)]
-            for _ in range(MapConfig.MAP_WIDTH.value)
-        ]
-        self._fields = self.generate_map_board(self._fields)
-
-        for obj in objs:
-            if obj.is_alive:
-                self._fields[obj.x][obj.y] = obj.icon
+    def add_fields(self, fields=None):
+        self._fields = FieldsCreator().create_fields()
+        return self
 
     def add_monsters(self, monsters):
-        self.monsters = monsters
-    
-    def set_icon(self, coords: Coordinate, icon) -> None:
-        self.fields[coords.x][coords.y] = icon
+        self._monsters = monsters
+        return self
+
+    def add_player(self, player):
+        self._player = player
+        return self
+
+
+class MapAction:
+    def __init__(self, _map):
+        self.map = _map
+
+    def get_obj_coords(self, obj) -> Coordinate:
+        try:
+            return [coord for coord, cell in self.map.fields.items() if cell is obj][0]
+        except IndexError:
+            print("Coords for the {obj} has not been found.")
+            exit(1)
+
+    def move_object(self, obj, old_coords, new_coords):
+        obj2 = self.map.fields[new_coords]
+
+        self.check_objects_intersections(obj, obj2)
+
+        self.map.fields[old_coords] = EmptyCell()
+        self.map.fields[new_coords] = obj
+
+    def check_objects_intersections(self, obj_one, obj_two):
+        if (
+            isinstance(obj_one, Player)
+            and isinstance(obj_two, Monster)
+            or isinstance(obj_two, Player)
+            and isinstance(obj_one, Monster)
+        ):
+            print("~~YOU LOSE!~~")
+            exit()
+
+    def show_map(self) -> None:
+        for i in range(MapConfig.MAP_HEIGHT.value):
+            for j in range(MapConfig.MAP_WIDTH.value):
+                print(self.map.fields[Coordinate(i, j)].icon, end=" ")
+            print()
+
+    def get_empty_cells_coords(self) -> list[Coordinate]:
+        return [
+            coord
+            for coord, cell in self.map.fields.items()
+            if isinstance(cell, EmptyCell)
+        ]
