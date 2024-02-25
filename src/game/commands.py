@@ -5,8 +5,6 @@ from src.map.map import Map
 from src.coordintate.coordinator import Coordinate
 from conf.map_config import MapConfig
 from src.games_types import Direction
-from src.objects.player import Player
-from src.objects.monster import Monster
 from src.objects.weapons.bullet import Bullet
 from src.objects.weapons.grenade import Grenade
 from src.objects.weapons.bfg import BFG
@@ -105,13 +103,17 @@ class MonsterCommands(Commands):
         super().__init__(_map)
 
     def monster_coords(self, monster):
-        return self.map.get_monster_coords(monster)
+        return self.map.map_actions.get_monster_coords(monster)
 
     def monster_step(self, monster):
         monster_coords = self.monster_coords(monster)
-        import pdb
+        new_monster_cords = get_next_coord_for_monster(
+            self.map,
+            self.map.map_actions.get_player_coords(),
+            self.map.map_actions.get_monster_coords(monster),
+        )
 
-        pdb.set_trace()
+        self.map.map_actions.move_object(monster, monster_coords, new_monster_cords)
 
 
 class BulletCommand:

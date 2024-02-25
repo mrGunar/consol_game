@@ -9,11 +9,11 @@ from conf.phrases import Phrase
 from src.objects.monster import Monster
 from src.objects.player import Player
 from src.game.services import (
-    get_next_coord_for_monster,
     is_move_valid,
     find_monster_with_coord,
 )
 from src.game.commands import PlayerCommands, MonsterCommands
+from src.games_types import Direction
 
 
 class Game:
@@ -157,14 +157,11 @@ class Game:
                 input(f"{Phrase.LOSE.value}\n{Phrase.EXIT.value}")
                 break
 
-            # monsters_last = sum([1 for x in self.monsters if x.is_alive])
-            # print(f"{Phrase.MONSTERS_REMAIN.value}: {monsters_last}")
-
             user_choice = input("Your step: w a s d: ")
             self.player_commands.user_step(user_choice)
             self.map.map_actions.show_map()
             os.system("cls")
-            continue
+
             for m in self.monsters:
                 self.monster_commands.monster_step(m)
             continue

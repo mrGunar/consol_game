@@ -1,5 +1,3 @@
-import random
-
 from conf.map_config import MapConfig
 from src.coordintate.coordinator import Coordinate
 from src.objects.map_objects import EmptyCell
@@ -46,7 +44,12 @@ class MapAction:
         self.map.fields[new_coords] = obj
 
     def check_objects_intersections(self, obj_one, obj_two):
-        if isinstance(obj_one, Player) and isinstance(obj_two, Monster):
+        if (
+            isinstance(obj_one, Player)
+            and isinstance(obj_two, Monster)
+            or isinstance(obj_two, Player)
+            and isinstance(obj_one, Monster)
+        ):
             print("~~YOU LOSE!~~")
             exit()
 
