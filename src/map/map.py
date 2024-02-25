@@ -35,6 +35,13 @@ class MapAction:
     def __init__(self, _map):
         self.map = _map
 
+    def get_obj_coords(self, obj) -> Coordinate:
+        try:
+            return [coord for coord, cell in self.map.fields.items() if cell is obj][0]
+        except IndexError:
+            print("Coords for the {obj} has not been found.")
+            exit(1)
+
     def move_object(self, obj, old_coords, new_coords):
         obj2 = self.map.fields[new_coords]
 
@@ -65,11 +72,3 @@ class MapAction:
             for coord, cell in self.map.fields.items()
             if isinstance(cell, EmptyCell)
         ]
-
-    def get_player_coords(self) -> Coordinate:
-        return [
-            coord for coord, cell in self.map.fields.items() if isinstance(cell, Player)
-        ][0]
-
-    def get_monster_coords(self, monster):
-        return [coord for coord, cell in self.map.fields.items() if cell is monster][0]

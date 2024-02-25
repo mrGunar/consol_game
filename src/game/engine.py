@@ -22,50 +22,50 @@ class BiasCoords:
     DOWN = Coordinate(1, 0)
 
 
-class Commands:
+class CommonEngine:
     def __init__(self, _map: Map):
-        self.map = _map
+        self._map = _map
 
 
-class PlayerCommands(Commands):
+class PlayerCommands(CommonEngine):
     def __init__(self, obj, _map):
         super().__init__(_map)
         self.player = obj
 
     @property
     def player_coords(self):
-        return self.map.map_actions.get_player_coords()
+        return self._map.map_actions.get_obj_coords(self.player)
 
     def move_up(self):
         player_coords = self.player_coords
         new_coords = player_coords + BiasCoords.UP
 
-        if is_move_valid(new_coords, self.map):
-            self.map.map_actions.move_object(self.player, player_coords, new_coords)
+        if is_move_valid(new_coords, self._map):
+            self._map.map_actions.move_object(self.player, player_coords, new_coords)
             self.player.last_direction = Direction.UP
 
     def move_left(self):
         player_coords = self.player_coords
         new_coords = player_coords + BiasCoords.LEFT
 
-        if is_move_valid(new_coords, self.map):
-            self.map.map_actions.move_object(self.player, player_coords, new_coords)
+        if is_move_valid(new_coords, self._map):
+            self._map.map_actions.move_object(self.player, player_coords, new_coords)
             self.player.last_direction = Direction.LEFT
 
     def move_down(self):
         player_coords = self.player_coords
         new_coords = player_coords + BiasCoords.DOWN
 
-        if is_move_valid(new_coords, self.map):
-            self.map.map_actions.move_object(self.player, player_coords, new_coords)
+        if is_move_valid(new_coords, self._map):
+            self._map.map_actions.move_object(self.player, player_coords, new_coords)
             self.player.last_direction = Direction.DOWN
 
     def move_right(self):
         player_coords = self.player_coords
         new_coords = player_coords + BiasCoords.RIGHT
 
-        if is_move_valid(new_coords, self.map):
-            self.map.map_actions.move_object(self.player, player_coords, new_coords)
+        if is_move_valid(new_coords, self._map):
+            self._map.map_actions.move_object(self.player, player_coords, new_coords)
             self.player.last_direction = Direction.RIGHT
 
     def user_step(self, user_choice: str) -> None:
@@ -94,26 +94,26 @@ class PlayerCommands(Commands):
 
     def shoot_bullet(self):
         bullet = Bullet(self.player.get_coords())
-        self.bullet_command = BulletCommand(bullet, self.map)
+        self.bullet_command = BulletCommand(bullet, self._map)
         self.bullet_command.bullet_fly(self.player.last_direction)
 
 
-class MonsterCommands(Commands):
+class MonsterCommands(CommonEngine):
     def __init__(self, _map):
         super().__init__(_map)
 
     def monster_coords(self, monster):
-        return self.map.map_actions.get_monster_coords(monster)
+        return self._map.map_actions.get_obj_coords(monster)
 
-    def monster_step(self, monster):
+    def monster_step(self, monster, player_coords):
         monster_coords = self.monster_coords(monster)
         new_monster_cords = get_next_coord_for_monster(
-            self.map,
-            self.map.map_actions.get_player_coords(),
-            self.map.map_actions.get_monster_coords(monster),
+            self._map,
+            self._map.map_actions.get_obj_coords(player_coords),
+            self._map.map_actions.get_obj_coords(monster),
         )
 
-        self.map.map_actions.move_object(monster, monster_coords, new_monster_cords)
+        self._map.map_actions.move_object(monster, monster_coords, new_monster_cords)
 
 
 class BulletCommand:

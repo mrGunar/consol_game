@@ -12,7 +12,7 @@ from src.game.services import (
     is_move_valid,
     find_monster_with_coord,
 )
-from src.game.commands import PlayerCommands, MonsterCommands
+from src.game.engine import PlayerCommands, MonsterCommands
 from src.games_types import Direction
 
 
@@ -163,7 +163,7 @@ class Game:
             os.system("cls")
 
             for m in self.monsters:
-                self.monster_commands.monster_step(m)
+                self.monster_commands.monster_step(m, self.player)
             continue
 
             monster_status, player_status = self.check_game_status()
